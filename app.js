@@ -1,1 +1,0 @@
-const perrunchis=["jose", "luis"]
