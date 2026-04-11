@@ -6,20 +6,16 @@ const productos = [
   { id: 5, nombre: "Diadema", categoria: "Audio", precio: 90000, stock: 8, ventas: 6 }
 ];
 
+function salida(texto) {
+  document.getElementById("salida").textContent += texto + "\n";
+}
+
+function limpiar() {
+  document.getElementById("salida").textContent = "";
+}
+
 function mostrarProductos() {
   productos.forEach(p => {
     salida(`${p.nombre} | ${p.categoria} | $${p.precio}`);
   });
-}
-
-function stockBajo() {
-  return productos.filter(p => p.stock > 0 && p.stock <= 5);
-}
-
-function agotados() {
-  return productos.filter(p => p.stock === 0);
-}
-
-function buscarProducto(nombre) {
-  return productos.find(p => p.nombre.toLowerCase() === nombre.toLowerCase());
 }
