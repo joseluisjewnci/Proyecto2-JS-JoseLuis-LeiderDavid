@@ -1,3 +1,16 @@
+const readline = require("readline");
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+function preguntar(texto) {
+  return new Promise(resolve => {
+    rl.question(texto, respuesta => resolve(respuesta));
+  });
+}
+
 const productos = [
   { id: 1, nombre: "Mouse", categoria: "Periferico", precio: 50000, stock: 10, ventas: 12 },
   { id: 2, nombre: "Teclado", categoria: "Periferico", precio: 120000, stock: 5, ventas: 7 },
@@ -6,17 +19,11 @@ const productos = [
   { id: 5, nombre: "Diadema", categoria: "Audio", precio: 90000, stock: 8, ventas: 6 }
 ];
 
-function mostrarSalida(texto) {
-  document.getElementById("salida").textContent += texto + "\n";
-}
-
-function limpiarSalida() {
-  document.getElementById("salida").textContent = "";
-}
+// FUNCIONES
 
 function mostrarProductos() {
   productos.forEach(p => {
-    mostrarSalida(`${p.nombre} - $${p.precio} - Stock: ${p.stock} - Ventas: ${p.ventas}`);
+    console.log(`${p.nombre} | ${p.categoria} | $${p.precio} | Stock: ${p.stock} | Ventas: ${p.ventas}`);
   });
 }
 
@@ -28,16 +35,16 @@ function agotados() {
   return productos.filter(p => p.stock === 0);
 }
 
-function nombresYPrecios() {
-  return productos.map(p => `${p.nombre}: $${p.precio}`);
-}
-
 function totalInventario() {
   return productos.reduce((acc, p) => acc + p.precio * p.stock, 0);
 }
 
 function totalVentas() {
-  return productos.reduce((acc, p) => acc + p.ventas, 0);
+  return productos.reduce((acc, p) => acc + (p.precio * p.ventas), 0);
+}
+
+function nombresYPrecios() {
+  return productos.map(p => `${p.nombre}: $${p.precio}`);
 }
 
 function ordenarPorPrecio() {
@@ -49,48 +56,55 @@ function buscarProducto(nombre) {
 }
 
 function verificarStock() {
-  const hayAgotados = productos.some(p => p.stock === 0);
-  const todosConStock = productos.every(p => p.stock > 0);
-  return { hayAgotados, todosConStock };
+  return {
+    hayAgotados: productos.some(p => p.stock === 0),
+    todosConStock: productos.every(p => p.stock > 0)
+  };
 }
 
-function clasificarPrecio(precio) {
-  let nivel;
-  switch (true) {
-    case precio < 50000:
-      nivel = "Económico";
-      break;
-    case precio <= 150000:
-      nivel = "Medio";
-      break;
-    default:
-      nivel = "Premium";
-  }
-  return nivel;
+function obtenerMasCaro() {
+  return [...productos].sort((a, b) => b.precio - a.precio)[0];
+}
+
+function obtenerMasBarato() {
+  return [...productos].sort((a, b) => a.precio - b.precio)[0];
+}
+
+function obtenerMasVendido() {
+  return [...productos].sort((a, b) => b.ventas - a.ventas)[0];
 }
 
 function reporteFinal() {
-  const masCaro = [...productos].sort((a, b) => b.precio - a.precio)[0];
-  const masBarato = [...productos].sort((a, b) => a.precio - b.precio)[0];
-  const masVendido = [...productos].sort((a, b) => b.ventas - a.ventas)[0];
-
-  mostrarSalida("=== REPORTE FINAL ===");
-  mostrarSalida(`Producto más caro: ${masCaro.nombre}`);
-  mostrarSalida(`Producto más barato: ${masBarato.nombre}`);
-  mostrarSalida(`Producto más vendido: ${masVendido.nombre}`);
-  mostrarSalida(`Valor total inventario: $${totalInventario()}`);
-  mostrarSalida(`Total unidades vendidas: ${totalVentas()}`);
-  mostrarSalida(`Cantidad agotados: ${agotados().length}`);
+  console.log("\n=== REPORTE FINAL ===");
+  console.log("Más caro:", obtenerMasCaro().nombre);
+  console.log("Más barato:", obtenerMasBarato().nombre);
+  console.log("Más vendido:", obtenerMasVendido().nombre);
+  console.log("Total inventario:", totalInventario());
+  console.log("Total ventas:", totalVentas());
 }
 
-function iniciarSistema() {
-  limpiarSalida();
+// MENÚ
 
-  let opcion = "1";
+async function iniciarSistema() {
+  let opcion = "";
 
-  while (opcion !== "0") {
-    opcion = prompt(
-      `MENÚ\n1. Mostrar productos\n2. Stock bajo\n3. Agotados\n4. Nombres y precios\n5. Total inventario\n6. Buscar producto\n7. Reporte final\n0. Salir`
+  while (opcion !== "14") {
+    opcion = await preguntar(
+      "\nMENÚ\n" +
+      "1. Mostrar productos\n" +
+      "2. Stock bajo\n" +
+      "3. Agotados\n" +
+      "4. Nombres y precios\n" +
+      "5. Total inventario\n" +
+      "6. Total ventas\n" +
+      "7. Buscar producto\n" +
+      "8. Verificar stock\n" +
+      "9. Producto más caro\n" +
+      "10. Producto más barato\n" +
+      "11. Producto más vendido\n" +
+      "12. Ordenar por precio\n" +
+      "13. Reporte final\n" +
+      "14. Salir\n> "
     );
 
     switch (opcion) {
@@ -98,30 +112,50 @@ function iniciarSistema() {
         mostrarProductos();
         break;
       case "2":
-        mostrarSalida(JSON.stringify(stockBajo(), null, 2));
+        console.log(stockBajo());
         break;
       case "3":
-        mostrarSalida(JSON.stringify(agotados(), null, 2));
+        console.log(agotados());
         break;
       case "4":
-        mostrarSalida(nombresYPrecios().join("\n"));
+        console.log(nombresYPrecios().join("\n"));
         break;
       case "5":
-        mostrarSalida(`$${totalInventario()}`);
+        console.log("Total inventario:", totalInventario());
         break;
       case "6":
-        const nombre = prompt("Ingrese producto a buscar");
-        const encontrado = buscarProducto(nombre);
-        mostrarSalida(encontrado ? JSON.stringify(encontrado, null, 2) : "No encontrado");
+        console.log("Total ventas:", totalVentas());
         break;
       case "7":
+        const nombre = await preguntar("Nombre del producto: ");
+        console.log(buscarProducto(nombre) || "No encontrado");
+        break;
+      case "8":
+        console.log(verificarStock());
+        break;
+      case "9":
+        console.log(obtenerMasCaro());
+        break;
+      case "10":
+        console.log(obtenerMasBarato());
+        break;
+      case "11":
+        console.log(obtenerMasVendido());
+        break;
+      case "12":
+        console.log(ordenarPorPrecio());
+        break;
+      case "13":
         reporteFinal();
         break;
-      case "0":
-        mostrarSalida("Sistema finalizado");
+      case "14":
+        console.log("Sistema finalizado");
+        rl.close();
         break;
       default:
-        mostrarSalida("Opción inválida");
+        console.log("Opción inválida");
     }
   }
 }
+
+iniciarSistema();
