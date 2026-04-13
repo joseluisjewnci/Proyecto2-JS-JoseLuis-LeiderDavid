@@ -1,3 +1,5 @@
+const { productos } = require("./productos");
+
 function stockBajo() {
   return productos.filter(p => p.stock > 0 && p.stock <= 5);
 }
@@ -11,5 +13,7 @@ function totalInventario() {
 }
 
 function totalVentas() {
-  return productos.reduce((acc, p) => acc + p.ventas, 0);
+  return productos.reduce((acc, p) => acc + (p.precio * p.ventas), 0);
 }
+
+module.exports = { stockBajo, agotados, totalInventario, totalVentas };
