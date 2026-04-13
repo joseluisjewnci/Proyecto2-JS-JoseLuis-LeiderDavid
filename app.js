@@ -6,16 +6,10 @@ const productos = [
   { id: 5, nombre: "Diadema", categoria: "Audio", precio: 90000, stock: 8, ventas: 6 }
 ];
 
-function salida(texto) {
-  document.getElementById("salida").textContent += texto + "\n";
-}
-
-function limpiar() {
-  document.getElementById("salida").textContent = "";
-}
-
 function mostrarProductos() {
   productos.forEach(p => {
-    salida(`${p.nombre} | ${p.categoria} | $${p.precio}`);
+    console.log(`${p.nombre} | ${p.categoria} | $${p.precio} | Stock: ${p.stock} | Ventas: ${p.ventas}`);
   });
 }
+
+module.exports = { productos, mostrarProductos };
