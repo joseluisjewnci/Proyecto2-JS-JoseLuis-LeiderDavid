@@ -6,3 +6,10 @@ const productos = [
   { id: 5, nombre: "Diadema", categoria: "Audio", precio: 90000, stock: 8, ventas: 6 }
 ];
 
+function mostrarProductos(){
+  productos.forEach(p =>{
+console.log(`${p.nombre}| ${p.categoria}|${p.precio}|stock: ${p.stock} | ventas: ${p.ventas}`);
+  })
+}
+module.exports= {productos, mostrarProductos};
+mostrarProductos(); 
